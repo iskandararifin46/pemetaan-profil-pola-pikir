@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemetaan Profil Pola Pikir - SMPN 34 Kota Tangerang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for Visualizing Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 40%, #eab308 100%);
+            min-height: 100vh;
+        }
+
+        /* Print styling rules */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .main-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="py-6 px-4 flex flex-col items-center justify-center min-h-screen">
+
+    <!-- Container Utama -->
+    <div class="main-card bg-white/95 backdrop-blur-md w-full max-w-4xl rounded-2xl shadow-2xl p-6 sm:p-10 border border-white/20 transition-all duration-300">
+        
+        <!-- Header Logo dan Judul Sekolah -->
+        <div class="flex flex-col items-center justify-center text-center mb-6">
+            <!-- Format Pemanggilan Logo Otomatis -->
+            <div class="w-24 h-24 mb-3 flex items-center justify-center relative">
+                <img id="schoolLogo" 
+                     src="logo.png" 
+                     alt="Logo SMPN 34 Kota Tangerang" 
+                     class="max-w-full max-h-full object-contain drop-shadow-md">
+                <div id="logoFallback" class="hidden w-24 h-24 rounded-full bg-blue-900 text-yellow-400 flex flex-col items-center justify-center font-bold text-[10px] p-2 text-center border-4 border-yellow-400 shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-3xl mb-1"></i>
+                    <span>SMPN 34</span>
+                </div>
+            </div>
+            
+            <h1 class="text-2xl sm:text-3xl font-black text-blue-900 tracking-wide uppercase">
+                PEMETAAN
+            </h1>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-blue-700 tracking-wider uppercase mb-1">
+                PROFIL POLA PIKIR
+            </h2>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                SMPN 34 KOTA TANGERANG
+            </p>
+        </div>
+
+        <!-- Banner Instruksi -->
+        <div class="bg-blue-100/80 border border-blue-200 text-blue-900 font-bold text-center py-2 px-4 rounded-lg text-sm sm:text-base mb-6 shadow-sm">
+            Pilih Paket - Jawab Pertanyaan - Tekan SUBMIT .
+        </div>
+
+        <!-- Form Identity Responden -->
+        <form id="quizForm" class="space-y-4">
+            <div>
+                <label class="block text-xs sm:text-sm font-extrabold text-gray-800 uppercase tracking-wide mb-1">
+                    NAMA RESPONDEN:
+                </label>
+                <input type="text" id="nama" placeholder="Tuliskan nama Anda" required
+                    class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition text-sm text-gray-800 font-medium">
+            </div>
+
+            <div>
+                <label class="block text-xs sm:text-sm font-extrabold text-gray-800 uppercase tracking-wide mb-1">
+                    INSTANSI / LEMBAGA:
+                </label>
+                <input type="text" id="instansi" value="SMPN 34 Kota Tangerang" placeholder="Pilih atau ketik instansi baru" required
+                    class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition text-sm text-gray-800 font-medium">
+            </div>
+
+            <div>
+                <label class="block text-xs sm:text-sm font-extrabold text-gray-800 uppercase tracking-wide mb-1">
+                    BIDANG / MAPEL:
+                </label>
+                <input type="text" id="bidang" placeholder="Tuliskan bidang atau mapel Anda" required
+                    class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition text-sm text-gray-800 font-medium">
+            </div>
+
+            <!-- Tombol Pilih Paket Soal -->
+            <div class="pt-4 pb-2 text-center">
+                <label class="block text-sm font-bold text-gray-800 uppercase tracking-wide mb-3">
+                    Pilih Paket Soal :
+                </label>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button type="button" onclick="selectPaket('dasar')" id="btn-dasar"
+                        class="btn-paket px-5 py-2 text-xs font-black uppercase rounded-full text-white bg-pink-500 hover:bg-pink-600 shadow-md transition transform active:scale-95 border-2 border-transparent">
+                        PAKET DASAR
+                    </button>
+                    <button type="button" onclick="selectPaket('menengah')" id="btn-menengah"
+                        class="btn-paket px-5 py-2 text-xs font-black uppercase rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md transition transform active:scale-95 border-2 border-transparent">
+                        MENENGAH
+                    </button>
+                    <button type="button" onclick="selectPaket('profesional')" id="btn-profesional"
+                        class="btn-paket px-5 py-2 text-xs font-black uppercase rounded-full text-white bg-purple-600 hover:bg-purple-700 shadow-md transition transform active:scale-95 border-2 border-transparent">
+                        PROFESIONAL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Baris Keterangan Opsi -->
+            <div class="bg-blue-50 border border-blue-200 text-blue-900 font-semibold text-center py-2 px-3 rounded-md text-xs sm:text-sm my-4">
+                Keterangan Opsi: <span class="font-bold">SS</span> = Sangat Setuju | <span class="font-bold">S</span> = Setuju | <span class="font-bold">TS</span> = Tidak Setuju | <span class="font-bold">STS</span> = Sangat Tidak Setuju
+            </div>
+
+            <!-- Area Daftar Pertanyaan (Dinamis dari Paket) -->
+            <div id="questionsContainer" class="space-y-6 pt-2">
+                <!-- Pertanyaan akan diinjeksi oleh JavaScript -->
+            </div>
+
+            <!-- Pesan Petunjuk jika Paket Belum Dipilih -->
+            <div id="placeholderSelectPaket" class="py-8 text-center border-2 border-dashed border-gray-300 rounded-xl bg-gray-50/50 my-4">
+                <i class="fa-solid fa-hand-pointer text-blue-500 text-3xl mb-2 animate-bounce"></i>
+                <p class="text-sm font-bold text-gray-700">Silakan pilih salah satu Paket Soal di atas untuk menampilkan pertanyaan.</p>
+                <p class="text-xs text-gray-500 mt-1">(Paket Dasar, Menengah, atau Profesional)</p>
+            </div>
+
+            <!-- Baris Tombol Aksi (Persis Gaya Gambar) -->
+            <div class="no-print pt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+                <button type="submit" 
+                    class="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> SUBMIT
+                </button>
+                <button type="button" onclick="resetForm()" 
+                    class="w-full py-2.5 px-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-rotate-left text-xs"></i> RESET
+                </button>
+                <button type="button" onclick="showAnalisis()" 
+                    class="w-full py-2.5 px-3 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-magnifying-glass-chart text-xs"></i> ANALISIS
+                </button>
+                <button type="button" onclick="showGrafik()" 
+                    class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-chart-pie text-xs"></i> GRAFIK
+                </button>
+                <button type="button" onclick="cetakHalaman()" 
+                    class="w-full py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-print text-xs"></i> CETAK
+                </button>
+                <button type="button" onclick="goHome()" 
+                    class="w-full py-2.5 px-3 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-lg text-xs tracking-wider uppercase shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-house text-xs"></i> HOME
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer Identitas Sekolah (Menggantikan Barcode & Credit Lama) -->
+        <div class="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-600 space-y-1">
+            <p class="font-semibold text-gray-700">Dipersembahkan untuk Pendidikan oleh:</p>
+            <p class="font-extrabold text-blue-900 text-sm tracking-wide">SMPN 34 KOTA TANGERANG</p>
+        </div>
+    </div>
+
+    <!-- Modal Pop-up untuk Analisis dan Grafik -->
+    <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 id="modalTitle" class="text-lg font-bold text-blue-900">Hasil Analisis Pola Pikir</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            
+            <div id="modalContent" class="space-y-4">
+                <!-- Content injected via JavaScript -->
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-blue-600 text-white rounded-lg font-bold text-xs uppercase hover:bg-blue-700">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-blue-900 text-white px-5 py-3 rounded-xl shadow-2xl hidden transition-all duration-300 z-50 flex items-center gap-3 border border-yellow-400">
+        <i class="fa-solid fa-circle-info text-yellow-400 text-lg"></i>
+        <span id="toastMessage" class="text-xs font-semibold">Pesan notifikasi</span>
+    </div>
+
+    <script>
+        // URL Google Apps Script Anda
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAnEZrpV95zNU0kTgVHIvB_SeJLPuGxqoICir_zY5Hi9jA6fF0pxg6L196ZYSGYvQr/exec';
+
+        // Automatic Detection and Robust Fallback for School Logo
+        const logoImg = document.getElementById('schoolLogo');
+        const logoFallback = document.getElementById('logoFallback');
+
+        // Handling onerror event for smooth fallback
+        if (logoImg) {
+            logoImg.onerror = function() {
+                this.classList.add('hidden');
+                if (logoFallback) logoFallback.classList.remove('hidden');
+            };
+        }
+
+        // Database Soal Pemetaan Profil Pola Pikir
+        const soalDatabase = {
+            dasar: [
+                "1. Saya memiliki kelemahan dalam melakukan beberapa hal.",
+                "2. Tidak masalah bila saya gagal sebab itu kesempatan untuk belajar.",
+                "3. Jika orang lain melakukan sesuatu yang lebih baik daripada saya, itu akan menyebabkan saya merasa rendah diri.",
+                "4. Saya suka mencoba hal-hal yang baru meskipun hal ini memiliki resiko.",
+                "5. Saya merasa sukses pada saat mampu menunjukkan kepada orang lain bahwa saya mahir dalam suatu bidang.",
+                "6. Ketika orang lain sukses, saya merasa terinspirasi dan ingin melakukan hal yang sama.",
+                "7. Saya senang saat mampu melakukan sesuatu yang tidak bisa dilakukan orang lain.",
+                "8. Tingkat kecerdasan bisa diubah lewat belajar dan berlatih",
+                "9. Menurut pendapat saya, manusia dilahirkan dengan tingkat kecerdasan tertentu yang tidak bisa diubah lagi",
+                "10. Kesulitan membuat saya ingin berusaha lebih keras lagi."
+            ],
+            menengah: [
+                "1. Kemampuan Anda adalah sesuatu yang sangat mendasar yang tidak banyak dapat Anda ubah lagi.",
+                "2. Tidak peduli seberapapun tingkat kemampuan Anda saat ini, Anda bisa mengubahnya walaupun sedikit.",
+                "3. Anda akan selalu dapat mengubah kemampuan Anda.",
+                "4. Anda adalah seseorang yang unik, tidak banyak yang dapat dilakukan untuk mengubahnya.",
+                "5. Anda akan selalu dapat mengubah diri Anda sendiri.",
+                "6. Kemampuan dalam bidang seni dan musik dapat dipelajari oleh siapapun.",
+                "7. Hanya sedikit orang yang benar-benar mahir dalam olahraga, Anda harus membawa bakat ini sejak lahir.",
+                "8. Matematika lebih mudah dipelajari oleh pria atau seseorang yang berada dalam lingkungan yang menyukainya.",
+                "9. Makin keras Anda mengerjakan sesuatu makin mahir Anda dalam hal ini.",
+                "10. Tidak peduli tipe apapun Anda saat ini, Anda akan selalu dapat mengubahnya.",
+                "11. Mencoba sesuatu yang baru akan sangat menyulitkan Anda sehingga Anda ingin menghindarinya.",
+                "12. Sebagian orang baik dan pintar, sebagian lagi tidak. Tidak banyak yang dapat berubah.",
+                "13. Saya sangat menghargai kritik dan saran dari siapapun juga terkait dengan kinerja saya saat ini.",
+                "14. Saya kurang senang bila ada kritik dan saran dari orang lain.",
+                "15. Semua orang yang tanpa cacat-otak atau cacat-lahir memiliki kemampuan yang sama dalam belajar.",
+                "16. Anda bisa mempelajari sesuatu yang baru, tapi Anda tidak bisa mengubah kemampuan Anda.",
+                "17. Anda dapat melakukan sesuatu secara berbeda, tapi sebenarnya Anda tetap tidak dapat mengubah kemampuan Anda.",
+                "18. Semua orang pada dasarnya baik, tapi kadang-kadang membuat keputusan yang salah.",
+                "19. Alasan terpenting mengapa Anda melakukan pekerjaan Anda adalah keinginan untuk mempelajari sesuatu yang baru.",
+                "20. Orang yang benar-benar cerdas, tidak perlu bekerja keras."
+            ],
+            profesional: [
+                "1. Saya beranggapan bahwa kecerdasan dan kemampuan utama seseorang pada dasarnya sudah ditentukan sejak lahir, sehingga usaha dan pengalaman baru hanya sedikit berpengaruh untuk benar-benar mengubahnya.",
+                "2. Meskipun saya memiliki keterbatasan dalam kemampuan tertentu saat ini, saya yakin dengan usaha yang konsisten, refleksi diri, dan strategi yang tepat, kemampuan tersebut dapat meningkat meskipun secara bertahap.",
+                "3. Saya percaya bahwa sepanjang hidup, manusia selalu punya peluang untuk menumbuhkan keterampilan baru dan memperbaiki kelemahan, asalkan memiliki motivasi dan kesediaan untuk terus belajar.",
+                "4. Menurut saya, kepribadian dan pola pikir yang melekat dalam diri seseorang adalah sesuatu yang tetap, sehingga pengalaman baru jarang benar-benar dapat mengubah sifat dasar individu.",
+                "5. Saya meyakini bahwa diri saya selalu bisa berkembang menjadi versi yang lebih baik, karena setiap tantangan dan kesalahan adalah bagian penting dari proses pembelajaran yang berkelanjutan.",
+                "6. Saya percaya bahwa keterampilan seni maupun musik bukan semata-mata bakat bawaan, melainkan sesuatu yang tetap bisa dikuasai siapa pun, termasuk orang dewasa, jika mereka mau berlatih dengan konsisten.",
+                "7. Saya memandang bahwa dalam olahraga, hanya orang yang sudah memiliki bakat alami sejak kecil yang dapat benar-benar mencapai tingkat keahlian tinggi, sementara latihan saja tidak cukup.",
+                "8. Menurut saya, kemampuan matematika lebih banyak dipengaruhi oleh faktor bawaan atau lingkungan tertentu, sehingga usaha belajar tidak banyak mengubah hasil bagi sebagian besar orang.",
+                "9. Saya yakin bahwa semakin keras saya berlatih, semakin sering saya mencoba strategi berbeda, dan semakin berani menghadapi tantangan, maka kemampuan saya akan meningkat jauh lebih baik.",
+                "10. Saya percaya bahwa identitas, cara berpikir, maupun tipe diri seseorang tidak bersifat tetap, melainkan dapat berubah secara signifikan seiring pengalaman hidup dan pembelajaran yang terus berlangsung.",
+                "11. Saya sering merasa bahwa mencoba hal-hal baru terlalu berisiko dan melelahkan, sehingga saya lebih memilih menghindari pengalaman yang tidak familiar agar tidak menambah beban.",
+                "12. Saya beranggapan bahwa ada orang yang memang cerdas sejak lahir dan ada yang tidak, dan kenyataan ini adalah sesuatu yang tetap, sehingga sulit diubah melalui pendidikan atau pengalaman.",
+                "13. Saya menilai kritik, masukan, maupun saran dari orang lain sebagai peluang berharga untuk merefleksikan diri, memperbaiki kelemahan, serta mengembangkan cara kerja saya agar lebih efektif.",
+                "14. Saya merasa kurang nyaman ketika ada orang lain yang memberi kritik atau masukan, karena hal tersebut sering membuat saya defensif atau merasa tidak dihargai.",
+                "15. Saya percaya bahwa semua orang yang sehat secara fisik dan mental pada dasarnya memiliki kesempatan yang sama untuk belajar dan berkembang, hanya saja kecepatan belajarnya bisa berbeda-beda.",
+                "16. Saya merasa bahwa menambah pengetahuan baru memang mungkin, tetapi secara umum kemampuan dasar saya sudah terbentuk dan sulit berubah secara mendasar.",
+                "17. Saya beranggapan bahwa meskipun saya dapat mencoba pendekatan atau strategi baru, pada hakikatnya kemampuan inti saya tidak banyak berubah dari waktu ke waktu.",
+                "18. Saya percaya bahwa pada dasarnya setiap orang memiliki niat baik, namun dalam praktiknya seringkali mereka mengambil keputusan yang salah karena keterbatasan pengetahuan atau kondisi tertentu.",
+                "19. Bagi saya, motivasi utama dalam bekerja bukan hanya mendapatkan penghasilan, tetapi juga memperoleh kesempatan untuk mempelajari hal-hal baru yang menantang dan memperluas wawasan.",
+                "20. Saya berpandangan bahwa orang yang benar-benar cerdas dapat meraih keberhasilan tanpa harus berusaha keras, karena kecerdasan alami mereka sudah memberi keuntungan besar sejak awal."
+            ]
+        };
+
+        let currentPaket = '';
+
+        function selectPaket(paket) {
+            currentPaket = paket;
+            
+            // Highlight selected button
+            document.querySelectorAll('.btn-paket').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-yellow-400', 'scale-105');
+            });
+            const selectedBtn = document.getElementById(`btn-${paket}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('ring-4', 'ring-yellow-400', 'scale-105');
+            }
+
+            // Hide placeholder message
+            const placeholder = document.getElementById('placeholderSelectPaket');
+            if (placeholder) placeholder.style.display = 'none';
+
+            // Generate questions
+            const container = document.getElementById('questionsContainer');
+            const listSoal = soalDatabase[paket] || [];
+            
+            let html = `<div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-4">
+                <h4 class="font-black text-blue-900 uppercase text-xs sm:text-sm tracking-wide mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-[#1e3a8a] fa-list-check"></i> DAFTAR PERTANYAAN (${paket.toUpperCase()})
+                </h4>
+                <div class="space-y-4">`;
+
+            listSoal.forEach((soal, index) => {
+                const qNum = index + 1;
+                html += `
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition">
+                        <p class="text-xs sm:text-sm font-semibold text-gray-800 mb-3">${soal}</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold">
+                            <label class="flex items-center gap-2 p-2 rounded border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+                                <input type="radio" name="q_${qNum}" value="4" required class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700">SS (Sangat Setuju)</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+                                <input type="radio" name="q_${qNum}" value="3" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700">S (Setuju)</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+                                <input type="radio" name="q_${qNum}" value="2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700">TS (Tidak Setuju)</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+                                <input type="radio" name="q_${qNum}" value="1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-700">STS (Sangat Tidak Setuju)</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+            showToast(`Paket ${paket.toUpperCase()} berhasil dipilih!`);
+        }
+
+        // Handle Submit Form
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!currentPaket) {
+                showToast("Pilih Paket Soal terlebih dahulu!");
+                return;
+            }
+
+            const nama = document.getElementById('nama').value;
+            const instansi = document.getElementById('instansi').value;
+            const bidang = document.getElementById('bidang').value;
+
+            if (!nama || !instansi || !bidang) {
+                showToast("Harap isi Nama, Instansi, dan Bidang/Mapel!");
+                return;
+            }
+
+            const score = calculateScore();
+            if (!score) {
+                showToast("Silakan jawab seluruh pertanyaan!");
+                return;
+            }
+
+            let kriteria = "";
+            if (score.percentage >= 80) {
+                kriteria = "Sangat Kuat (Growth Mindset Dominan)";
+            } else if (score.percentage >= 60) {
+                kriteria = "Berkembang (Growth Mindset Baik)";
+            } else {
+                kriteria = "Perlu Evaluasi (Fixed Mindset Cenderung Dominan)";
+            }
+
+            // Kirim data ke Google Sheets jika URL tersedia
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.trim() !== '') {
+                showToast("Mengirim data ke Google Sheets...");
+                
+                const payload = {
+                    nama: nama,
+                    instansi: instansi,
+                    bidang: bidang,
+                    paket: currentPaket.toUpperCase(),
+                    skor: `${score.total}/${score.max}`,
+                    persentase: score.percentage,
+                    kategori: kriteria
+                };
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(() => {
+                    showToast("Data berhasil tersimpan di Google Sheets!");
+                })
+                .catch(err => {
+                    console.error("Gagal mengirim:", err);
+                    showToast("Selesai diproses (Pengiriman background).");
+                });
+            }
+
+            showAnalisis();
+        });
+
+        function resetForm() {
+            document.getElementById('quizForm').reset();
+            currentPaket = '';
+            document.getElementById('questionsContainer').innerHTML = '';
+            const placeholder = document.getElementById('placeholderSelectPaket');
+            if (placeholder) placeholder.style.display = 'block';
+            document.querySelectorAll('.btn-paket').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-yellow-400', 'scale-105');
+            });
+            showToast("Form berhasil dikosongkan.");
+        }
+
+        function calculateScore() {
+            if (!currentPaket) return null;
+            const answers = document.querySelectorAll('#questionsContainer input[type="radio"]:checked');
+            const totalQuestions = soalDatabase[currentPaket] ? soalDatabase[currentPaket].length : 0;
+            
+            if (answers.length < totalQuestions) return null;
+
+            let total = 0;
+            answers.forEach(radio => {
+                total += parseInt(radio.value);
+            });
+            
+            const maxScore = totalQuestions * 4;
+            return {
+                total: total,
+                max: maxScore,
+                percentage: Math.round((total / maxScore) * 100)
+            };
+        }
+
+        function showAnalisis() {
+            const nama = document.getElementById('nama').value;
+            const instansi = document.getElementById('instansi').value;
+            const bidang = document.getElementById('bidang').value;
+
+            if (!nama || !instansi || !bidang) {
+                showToast("Harap isi Nama, Instansi, dan Bidang/Mapel terlebih dahulu!");
+                return;
+            }
+
+            const score = calculateScore();
+            if (!score) {
+                showToast("Silakan pilih paket dan jawab seluruh pertanyaan!");
+                return;
+            }
+
+            let kriteria = "";
+            let saran = "";
+
+            if (score.percentage >= 80) {
+                kriteria = "Sangat Kuat (Growth Mindset Dominan)";
+                saran = "Anda memiliki pola pikir berkembang yang sangat kuat. Pertahankan keterbukaan terhadap tantangan dan motivasi orang lain di sekitar Anda.";
+            } else if (score.percentage >= 60) {
+                kriteria = "Berkembang (Growth Mindset Baik)";
+                saran = "Pola pikir Anda sudah positif. Tingkatkan lagi keberanian untuk mengambil risiko dan belajar dari hambatan.";
+            } else {
+                kriteria = "Perlu Evaluasi (Fixed Mindset Cenderung Dominan)";
+                saran = "Cobalah untuk lebih terbuka terhadap dorongan belajar dari kesalahan dan tidak ragu mencoba metode-metode baru.";
+            }
+
+            const content = `
+                <div class="space-y-3 border-b pb-4 text-xs sm:text-sm">
+                    <p><strong class="text-blue-900">Nama Responden:</strong> ${nama}</p>
+                    <p><strong class="text-blue-900">Instansi:</strong> ${instansi}</p>
+                    <p><strong class="text-blue-900">Bidang / Mapel:</strong> ${bidang}</p>
+                    <p><strong class="text-blue-900">Paket Soal:</strong> <span class="uppercase font-bold text-blue-600">${currentPaket}</span></p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl text-center">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Skor Perolehan</p>
+                    <p class="text-3xl font-black text-blue-900">${score.total} / ${score.max}</p>
+                    <p class="text-xs font-bold text-blue-700 mt-1">Persentase: ${score.percentage}%</p>
+                </div>
+                <div class="p-4 rounded-xl border border-gray-200">
+                    <p class="text-xs font-bold uppercase text-gray-500 mb-1">Kategori Pola Pikir:</p>
+                    <p class="text-sm font-extrabold text-blue-900 mb-2">${kriteria}</p>
+                    <p class="text-xs text-gray-700 leading-relaxed">${saran}</p>
+                </div>
+            `;
+
+            document.getElementById('modalTitle').innerText = 'Hasil Analisis Pola Pikir';
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('resultModal').classList.remove('hidden');
+        }
+
+        function showGrafik() {
+            const score = calculateScore();
+            if (!score) {
+                showToast("Silakan pilih paket dan isi jawaban terlebih dahulu untuk melihat grafik!");
+                return;
+            }
+
+            const content = `
+                <div class="text-center mb-2">
+                    <p class="text-xs font-bold text-gray-500 uppercase">Visualisasi Hasil Pemetaan</p>
+                </div>
+                <div class="w-full max-w-xs mx-auto">
+                    <canvas id="myChart" width="250" height="250"></canvas>
+                </div>
+            `;
+
+            document.getElementById('modalTitle').innerText = 'Grafik Pola Pikir';
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('resultModal').classList.remove('hidden');
+
+            setTimeout(() => {
+                const ctx = document.getElementById('myChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Skor Dicapai', 'Sisa Skor'],
+                        datasets: [{
+                            data: [score.total, score.max - score.total],
+                            backgroundColor: ['#1e3a8a', '#e2e8f0'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+        }
+
+        function cetakHalaman() {
+            window.print();
+        }
+
+        function goHome() {
+            resetForm();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
